@@ -30,7 +30,7 @@ logger.info(checks())
 model = RTDETR(model_name)
 model.info()
 results = model.train(data=f"{dataset_name}.yaml",
-    amp=True,
+    workers=5,    
     epochs=100,
     imgsz=640,
     device=device,
@@ -40,5 +40,5 @@ results = model.train(data=f"{dataset_name}.yaml",
     seed=42,
     plots=True,
     save=True,
-    save_period=10
+    save_period=5
   )

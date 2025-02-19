@@ -32,7 +32,7 @@ model.info()
 results = model.train(data=f"{dataset_name}.yaml",
     workers=2,    
     epochs=100,
-    batch_size=4,
+    batch=4,
     imgsz=640,
     device=device,
     patience=5,

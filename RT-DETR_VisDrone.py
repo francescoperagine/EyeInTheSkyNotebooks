@@ -22,7 +22,7 @@ print(f"Device: {device}")
 
 settings.update({"wandb": True})
 
-wandb.login(key=secrets['api_key'])
+wandb.login(key=secrets['WANDB_API_KEY'])
 
 logger.info("Performing training for model...")
 logger.info(checks())

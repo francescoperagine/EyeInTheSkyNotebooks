@@ -8,7 +8,6 @@ from ultralytics import YOLO, checks, settings
 from dotenv import dotenv_values
 
 model_name = "yolo11n"
-
 secrets = dotenv_values(".env")
 
 project_name = "EyeInTheSky"
@@ -23,7 +22,7 @@ print(f"Device: {device}")
 
 settings.update({"wandb": True})
 
-wandb.login(key=secrets['api_key'])
+wandb.login(key=secrets['WANDB_API_KEY'])
 
 logger.info("Performing training for model...")
 logger.info(checks())
@@ -39,6 +38,8 @@ results = model.train(data=f"{dataset_name}.yaml",
     name=experiment_name,
     seed=42,
     plots=True,
-    val=True
+    val=True,
+    save=True,
+    save_period=10
   )
 

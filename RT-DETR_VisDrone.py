@@ -30,8 +30,9 @@ logger.info(checks())
 model = RTDETR(model_name)
 model.info()
 results = model.train(data=f"{dataset_name}.yaml",
-    workers=5,    
+    workers=2,    
     epochs=100,
+    batch_size=4,
     imgsz=640,
     device=device,
     patience=5,

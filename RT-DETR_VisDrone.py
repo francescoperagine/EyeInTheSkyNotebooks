@@ -28,11 +28,18 @@ logger.info("Performing training for model...")
 logger.info(checks())
 
 model = RTDETR(model_name)
+for k, v in model.named_parameters():
+    print(k)
+
 model.info()
 results = model.train(data=f"{dataset_name}.yaml",
-    workers=2,    
-    epochs=100,
+    workers=1,    
     batch=4,
+    epochs=100,
+    half=True,
+    augment=False,
+    cache=False,
+    amp=True,
     imgsz=640,
     device=device,
     patience=5,

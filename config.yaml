@@ -1,0 +1,79 @@
+train: true
+model_name: "yolo12n"
+
+project_name: "EyeInTheSky"
+experiment_name: "YOLO_VisDrone"
+dataset_name: "VisDrone"
+
+raw_data_dir: "data/raw"
+data_dir: "data"
+config_dir: "config"
+interim_data_dir: "data/interim"
+processed_data_dir: "data/processed"
+external_data_dir: "data/external"
+models_dir: "models"
+reports_dir: "reports"
+figures_dir: "reports/figures"
+
+# Ray Tune Configuration
+tune:
+  # Main tune parameters
+  num_samples: 30
+  
+  # Scheduler configuration
+  scheduler:
+    type: 'ASHA'
+    iterations: 50 
+    grace_period: 10 
+    reduction_factor: 3
+    brackets: 3
+  
+  # Hyperparameter search space
+  space:
+    # Discrete choices (will use tune.choice)
+    batch_size: [8, 16, 32]
+    warmup_epochs: [1, 3, 5]
+    
+    # Continuous ranges (will use tune.uniform)
+    cls: {"min": 0.5, "max": 1.5}
+    box_weight: {"min": 4.0, "max": 7.0}
+    lr0: {"min": 0.0001, "max": 0.01}
+    lrf: {"min": 0.01, "max": 0.1}
+    warmup_momentum: {"min": 0.8, "max": 0.95}
+    momentum: {"min": 0.8, "max": 0.99}
+    weight_decay: {"min": 0.00001, "max": 0.001}
+    mosaic: {"min": 0.5, "max": 1.0}
+    scale: {"min": 0.2, "max": 0.6}
+    hsv_h: {"min": 0.01, "max": 0.05}
+    hsv_s: {"min": 0.5, "max": 0.9}
+    hsv_v: {"min": 0.5, "max": 0.9}
+
+# Fixed Training Configuration
+train:
+  workers: 8               # Number of data loader workers
+  seed: 42                 # Random seed
+
+  # Dataset Configuration
+  data: 'VisDrone.yaml'     # Path to data config file
+  imgsz: 640               # Input image size
+  cache: 'mem'             # Cache images in memory
+  
+  # Training Parameters
+  epochs: 50              # Maximum epochs for each trial
+  patience: 10            # Early stopping patience
+  amp: True               # Automatic Mixed Precision
+  plots: True             # Don't create training plots during tuning
+  save: True              # Save checkpoints
+  save_period: 10         # Save every X epochs
+  val: True               # Run validation
+  cos_lr: True            # Cosine learning rate
+   
+  # Model Parameters
+  overlap_mask: True      # Overlapping masks
+  mask_ratio: 4           # Mask downsample ratio
+  dropout: 0.1            # Dropout rate
+  
+  # Logging
+  project: 'EyeInTheSky'  # Project name
+  name: 'tune_experiment' # Experiment name
+  exist_ok: False         # Increment run if exists

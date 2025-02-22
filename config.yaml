@@ -17,36 +17,42 @@ figures_dir: "reports/figures"
 
 # Ray Tune Configuration
 tune:
-  # Main tune parameters
-  num_samples: 30
+  iterations: 30
   
-  # Scheduler configuration
+  # Scheduler configuration (using ASHA/HyperBand parameters)
   scheduler:
-    type: 'ASHA'
-    iterations: 50 
+    max_t: 50         # Maximum iterations (epochs)
     grace_period: 10 
     reduction_factor: 3
-    brackets: 3
-  
+
   # Hyperparameter search space
   space:
-    # Discrete choices (will use tune.choice)
+    # Discrete choices (using tune.choice)
     batch_size: [8, 16, 32]
-    warmup_epochs: [1, 3, 5]
+    warmup_epochs: [0, 1, 3, 5]
     
-    # Continuous ranges (will use tune.uniform)
-    cls: {"min": 0.5, "max": 1.5}
-    box_weight: {"min": 4.0, "max": 7.0}
-    lr0: {"min": 0.0001, "max": 0.01}
-    lrf: {"min": 0.01, "max": 0.1}
-    warmup_momentum: {"min": 0.8, "max": 0.95}
-    momentum: {"min": 0.8, "max": 0.99}
-    weight_decay: {"min": 0.00001, "max": 0.001}
-    mosaic: {"min": 0.5, "max": 1.0}
-    scale: {"min": 0.2, "max": 0.6}
-    hsv_h: {"min": 0.01, "max": 0.05}
-    hsv_s: {"min": 0.5, "max": 0.9}
-    hsv_v: {"min": 0.5, "max": 0.9}
+    # Continuous ranges (to be used with tune.uniform)
+    lr0: {"min": 1e-5, "max": 1e-1}            # Initial learning rate
+    lrf: {"min": 0.01, "max": 1.0}             # Final learning rate factor
+    momentum: {"min": 0.6, "max": 0.98}          # Momentum
+    weight_decay: {"min": 0.0, "max": 0.001}     # Weight decay (L2 regularization)
+    warmup_momentum: {"min": 0.0, "max": 0.95}   # Warmup momentum
+    box: {"min": 0.02, "max": 0.2}               # Bounding box loss weight (renamed from box_weight)
+    cls: {"min": 0.2, "max": 4.0}                # Classification loss weight
+    hsv_h: {"min": 0.0, "max": 0.1}              # Hue augmentation range
+    hsv_s: {"min": 0.0, "max": 0.9}              # Saturation augmentation range
+    hsv_v: {"min": 0.0, "max": 0.9}              # Value (brightness) augmentation range
+    # Optionally add more augmentation parameters if needed:
+    # degrees: {"min": 0.0, "max": 45.0}
+    # translate: {"min": 0.0, "max": 0.9}
+    # scale: {"min": 0.0, "max": 0.9}
+    # shear: {"min": 0.0, "max": 10.0}
+    # perspective: {"min": 0.0, "max": 0.001}
+    # flipud: {"min": 0.0, "max": 1.0}
+    # fliplr: {"min": 0.0, "max": 1.0}
+    # mosaic: {"min": 0.0, "max": 1.0}
+    # mixup: {"min": 0.0, "max": 1.0}
+    # copy_paste: {"min": 0.0, "max": 1.0}
 
 # Fixed Training Configuration
 train:

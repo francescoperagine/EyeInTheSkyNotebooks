@@ -6,5 +6,5 @@ PyYAML==6.0.2
 ray==2.42.1
 torch==2.6.0
 typer==0.15.1
-ultralytics==8.3.68
+ultralytics==8.3.78
 wandb==0.19.7

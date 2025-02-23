@@ -2,7 +2,6 @@ train: true
 model_name: "yolo12n"
 
 project_name: "EyeInTheSky"
-experiment_name: "YOLO_VisDrone"
 dataset_name: "VisDrone"
 
 raw_data_dir: "data/raw"
@@ -16,28 +15,41 @@ reports_dir: "reports"
 figures_dir: "reports/figures"
 
 # Ray Tune Configuration
+shared_args:
+  workers: 8               # Number of data loader workers
+  seed: 42                 # Random seed
+  exist_ok: False          # Don't increment run if exists
+  cos_lr: True            # Cosine learning rate
+  imgsz: 640               # Input image size
+
+# Fixed Training Configuration
+train:
+  experiment_name: "YOLO_VisDrone-Training"
+  epochs: 300             # Number of training epochs
+  plots: True             # Don't create training plots during tuning
+  save: True              # Save checkpoints
+  save_period: 10         # Save every X epochs
+  val: True               # Run validation
+
 tune:
-  iterations: 30
-  
-  # Scheduler configuration (using ASHA/HyperBand parameters)
-  scheduler:
-    max_t: 50         # Maximum iterations (epochs)
+  train_args:
+    experiment_name: 'YOLO_VisDrone-Tuning' # Experiment name
+    iterations: 30
     grace_period: 10 
-    reduction_factor: 3
+    plots: False
+    val: False
+    patience: 10            # Early stopping patience
+    overlap_mask: True      # Overlapping masks
+    mask_ratio: 4           # Mask downsample ratio
 
   # Hyperparameter search space
   space:
-    # Discrete choices (using tune.choice)
-    batch_size: [8, 16, 32]
-    warmup_epochs: [0, 1, 3, 5]
-    
     # Continuous ranges (to be used with tune.uniform)
     lr0: {"min": 1e-5, "max": 1e-1}            # Initial learning rate
     lrf: {"min": 0.01, "max": 1.0}             # Final learning rate factor
     momentum: {"min": 0.6, "max": 0.98}          # Momentum
     weight_decay: {"min": 0.0, "max": 0.001}     # Weight decay (L2 regularization)
     warmup_momentum: {"min": 0.0, "max": 0.95}   # Warmup momentum
-    box: {"min": 0.02, "max": 0.2}               # Bounding box loss weight (renamed from box_weight)
     cls: {"min": 0.2, "max": 4.0}                # Classification loss weight
     hsv_h: {"min": 0.0, "max": 0.1}              # Hue augmentation range
     hsv_s: {"min": 0.0, "max": 0.9}              # Saturation augmentation range
@@ -54,32 +66,4 @@ tune:
     # mixup: {"min": 0.0, "max": 1.0}
     # copy_paste: {"min": 0.0, "max": 1.0}
 
-# Fixed Training Configuration
-train:
-  workers: 8               # Number of data loader workers
-  seed: 42                 # Random seed
 
-  # Dataset Configuration
-  data: 'VisDrone.yaml'     # Path to data config file
-  imgsz: 640               # Input image size
-  cache: 'mem'             # Cache images in memory
-  
-  # Training Parameters
-  epochs: 50              # Maximum epochs for each trial
-  patience: 10            # Early stopping patience
-  amp: True               # Automatic Mixed Precision
-  plots: True             # Don't create training plots during tuning
-  save: True              # Save checkpoints
-  save_period: 10         # Save every X epochs
-  val: True               # Run validation
-  cos_lr: True            # Cosine learning rate
-   
-  # Model Parameters
-  overlap_mask: True      # Overlapping masks
-  mask_ratio: 4           # Mask downsample ratio
-  dropout: 0.1            # Dropout rate
-  
-  # Logging
-  project: 'EyeInTheSky'  # Project name
-  name: 'tune_experiment' # Experiment name
-  exist_ok: False         # Increment run if exists
